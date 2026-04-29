@@ -1,0 +1,71 @@
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import authRoutes from './routes/authRoutes.js';
+import categoryRoutes from './routes/categoryRoutes.js';
+import transactionRoutes from './routes/transactionRoutes.js';
+import budgetRoutes from './routes/budgetRoutes.js';
+import goalRoutes from './routes/goalRoutes.js';
+import reportRoutes from './routes/reportRoutes.js';
+import payeRoutes from './routes/payeRoutes.js';
+import chilimbaRoutes from './routes/chilimbaRoutes.js';
+import recurringRoutes from './routes/recurringRoutes.js';
+import reminderRoutes from './routes/reminderRoutes.js';
+import notificationRoutes from './routes/notificationRoutes.js';
+import aiRoutes from './routes/aiRoutes.js';
+import { me } from './controllers/authController.js';
+import { requireAuth } from './middleware/auth.js';
+import { errorHandler, notFound } from './middleware/errorHandler.js';
+
+dotenv.config();
+
+const app = express();
+const clientOrigin = process.env.CLIENT_ORIGIN ?? 'http://localhost:5173';
+
+function isAllowedDevOrigin(origin: string): boolean {
+  if (origin === clientOrigin) {
+    return true;
+  }
+
+  return /^http:\/\/(localhost|127\.0\.0\.1|10\.\d+\.\d+\.\d+|192\.168\.\d+\.\d+|172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+)(:\d+)?$/.test(
+    origin
+  );
+}
+
+app.use(
+  cors({
+    origin(origin, callback) {
+      if (!origin || isAllowedDevOrigin(origin)) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error('CORS origin not allowed'));
+    }
+  })
+);
+app.use(express.json({ limit: '1mb' }));
+
+app.get('/api/health', (_req, res) => {
+  res.json({ ok: true });
+});
+
+app.get('/api/me', requireAuth, me);
+
+app.use('/api/auth', authRoutes);
+app.use('/api/categories', categoryRoutes);
+app.use('/api/transactions', transactionRoutes);
+app.use('/api/budgets', budgetRoutes);
+app.use('/api/goals', goalRoutes);
+app.use('/api/reports', reportRoutes);
+app.use('/api/paye', payeRoutes);
+app.use('/api/chilimba', chilimbaRoutes);
+app.use('/api/recurring', recurringRoutes);
+app.use('/api/reminders', reminderRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/ai', aiRoutes);
+
+app.use(notFound);
+app.use(errorHandler);
+
+export default app;

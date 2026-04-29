@@ -1,0 +1,78 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap');
+@import './tokens.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color: var(--color-text);
+  background: var(--color-bg);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top right, rgba(0, 200, 150, 0.1), transparent 44%),
+    radial-gradient(circle at bottom left, rgba(0, 136, 204, 0.08), transparent 50%),
+    #0d1117;
+  color: var(--color-text);
+  font-family: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+body .bg-white,
+body .bg-white\/90 {
+  background-color: var(--color-surface);
+}
+
+body .bg-brand-50 {
+  background-color: rgba(0, 200, 150, 0.08);
+}
+
+body .bg-brand-100 {
+  background-color: rgba(0, 200, 150, 0.16);
+}
+
+body .text-slate-900,
+body .text-slate-800 {
+  color: var(--color-text);
+}
+
+body .text-slate-700 {
+  color: #c9d1d9;
+}
+
+body .text-slate-600,
+body .text-slate-500 {
+  color: var(--color-muted);
+}
+
+body .border-brand-100,
+body .border-slate-200 {
+  border-color: var(--color-border);
+}
+
+body .shadow-soft {
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.28);
+}
+
+body .bg-brand-500 {
+  background-color: var(--color-primary);
+}
+
+body .hover\:bg-brand-50:hover {
+  background-color: rgba(0, 200, 150, 0.12);
+}
+
+body .hover\:bg-brand-100:hover {
+  background-color: rgba(0, 200, 150, 0.16);
+}
+
+body .hover\:bg-slate-50:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+}
