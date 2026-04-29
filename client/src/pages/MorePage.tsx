@@ -7,7 +7,6 @@ export function MorePage() {
       <MoreLink to="/paye" title="PAYE Calculator" description="Estimate Zambian PAYE and net pay" />
       <MoreLink to="/chilimba" title="Chilimba Tracker" description="Manage group rounds and payouts" />
       <MoreLink to="/recurring" title="Recurring" description="Manage recurring transactions and schedules" />
-      <MoreLink to="/reminders" title="Reminders" description="Bill reminders & alerts" />
       <MoreLink to="/notifications" title="Notifications" description="System notifications and alerts" />
       <MoreLink to="/chatbot" title="AI Chatbot" description="Ask personalized finance questions" />
     </div>

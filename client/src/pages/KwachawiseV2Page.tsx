@@ -154,7 +154,7 @@ function pathToPageId(pathname: string): V2PageId {
   if (path.startsWith('/goals')) return 'goals';
   if (path.startsWith('/chilimba')) return 'chilimba';
   if (path.startsWith('/paye')) return 'paye';
-  if (path.startsWith('/reminders') || path.startsWith('/bills')) return 'bills';
+  if (path.startsWith('/bills')) return 'transactions';
   if (path.startsWith('/recurring')) return 'recurring';
   if (path.startsWith('/debt')) return 'debt';
   if (path.startsWith('/networth')) return 'networth';
@@ -185,7 +185,7 @@ function pageIdToPath(pageId: V2PageId): string {
     case 'paye':
       return '/paye';
     case 'bills':
-      return '/reminders';
+      return '/transactions';
     case 'recurring':
       return '/recurring';
     case 'debt':
@@ -325,7 +325,7 @@ export function KwachawiseV2Page() {
     goals: 'Savings Goals',
     chilimba: 'Chilimba Tracker',
     paye: 'PAYE Calculator',
-    bills: 'Bill Reminders',
+    bills: 'Transactions',
     recurring: 'Recurring Transactions',
     debt: 'Debt Tracker',
     networth: 'Net Worth',
@@ -736,9 +736,6 @@ export function KwachawiseV2Page() {
       </div>
 
       <div className="nav-section">Finance</div>
-      <div className={`nav-item ${activePage === 'bills' ? 'active' : ''}`} onClick={() => goTo('bills')}>
-        🔔 Bill Reminders <span className="nav-badge danger">2</span>
-      </div>
       <div className={`nav-item ${activePage === 'recurring' ? 'active' : ''}`} onClick={() => goTo('recurring')}>
         ↻ Recurring
       </div>
@@ -806,12 +803,12 @@ export function KwachawiseV2Page() {
   const scoreHistory = [58, 62, 65, 68, 70, 71, 73, 75];
 
   const calHeaders = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  const calEvents: Record<number, 'income' | 'today' | 'bill' | 'chilimba'> = {
+  const calEvents: Record<number, 'income' | 'today' | 'payment' | 'chilimba'> = {
     25: 'income',
     28: 'today',
-    30: 'bill',
+    30: 'payment',
     5: 'income',
-    1: 'bill',
+    1: 'payment',
     15: 'chilimba'
   };
 
@@ -914,7 +911,7 @@ export function KwachawiseV2Page() {
 
           <div className="content">
             <div className={`scroll-page ${activePage === 'dashboard' ? 'active' : ''}`} id="page-dashboard">
-              <div className="warning-banner">⚠ Dining budget exceeded by K 80 · ZESCO bill due in 2 days</div>
+              <div className="warning-banner">⚠ Dining budget exceeded by K 80 this week</div>
               <div className="stats-grid section">
                 <div className="stat-card income">
                   <div className="stat-label">Income</div>
@@ -942,10 +939,6 @@ export function KwachawiseV2Page() {
                 <div className="quick-btn" onClick={() => goTo('transactions')}>
                   <div className="quick-btn-icon">+</div>
                   <div className="quick-btn-label">Add Transaction</div>
-                </div>
-                <div className="quick-btn" onClick={() => goTo('bills')}>
-                  <div className="quick-btn-icon">🔔</div>
-                  <div className="quick-btn-label">Bill Reminders</div>
                 </div>
                 <div className="quick-btn" onClick={() => goTo('debt')}>
                   <div className="quick-btn-icon">📉</div>
@@ -1478,51 +1471,9 @@ export function KwachawiseV2Page() {
             </div>
 
             <div className={`scroll-page ${activePage === 'bills' ? 'active' : ''}`} id="page-bills">
-              <div className="section-header">
-                <div className="section-title">Bill Reminders</div>
-                <button className="add-btn">+ Add Bill</button>
-              </div>
-              <div className="warning-banner">⚠ 2 bills due within 3 days — ZESCO and Airtel</div>
-              <div className="two-col">
-                <div className="card">
-                  <div className="card-title" style={{ marginBottom: 12 }}>
-                    Upcoming Bills
-                  </div>
-                  {bills.map((b) => (
-                    <div className="bill-item" key={`${b.name}-${b.due}`}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1 }}>
-                        <span style={{ fontSize: 18 }}>{b.icon}</span>
-                        <div>
-                          <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--t1)' }}>{b.name}</div>
-                          <div style={{ fontSize: 11, color: 'var(--t2)' }}>Due {b.due}</div>
-                        </div>
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <span style={{ fontFamily: 'var(--mono)', fontSize: 13, fontWeight: 500, color: 'var(--t1)' }}>
-                          K{b.amount}
-                        </span>
-                        <span className={`bill-due ${b.status}`}>
-                          {b.status === 'overdue' ? 'Overdue' : b.status === 'soon' ? 'Due soon' : 'Upcoming'}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <div className="card">
-                  <div className="card-title" style={{ marginBottom: 12 }}>
-                    Monthly Bill Summary
-                  </div>
-                  <div style={{ fontSize: 28, fontWeight: 700, fontFamily: 'var(--mono)', color: 'var(--t1)', marginBottom: 4 }}>
-                    {formatK(billsTotal)}
-                  </div>
-                  <div style={{ fontSize: 12, color: 'var(--t2)', marginBottom: 14 }}>Total bills this month</div>
-                  {bills.map((b) => (
-                    <div key={b.name} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                      <span style={{ fontSize: 12, color: 'var(--t2)' }}>{b.name}</span>
-                      <span style={{ fontSize: 12, fontFamily: 'var(--mono)', color: 'var(--t1)' }}>K{b.amount}</span>
-                    </div>
-                  ))}
-                </div>
+              <div className="card">
+                <div className="card-title">Payments are hidden</div>
+                <div className="card-sub">Use transactions and recurring schedules instead.</div>
               </div>
             </div>
 
@@ -1954,7 +1905,7 @@ export function KwachawiseV2Page() {
                   </div>
 
                   <div style={{ display: 'flex', gap: 14, marginTop: 12, fontSize: 11, color: 'var(--t2)' }}>
-                    <span>● Bill due</span>
+                    <span>● Payment</span>
                     <span style={{ color: 'var(--acc)' }}>● Salary</span>
                     <span style={{ color: 'var(--info)' }}>● Chilimba</span>
                   </div>
@@ -1966,8 +1917,8 @@ export function KwachawiseV2Page() {
                   </div>
 
                   {[{ icon: '💼', date: 'Apr 25', name: 'Salary received', color: 'var(--acc)' },
-                    { icon: '⚡', date: 'Apr 30', name: 'ZESCO bill due', color: 'var(--danger)' },
-                    { icon: '📱', date: 'Apr 30', name: 'Airtel bill due', color: 'var(--warn)' },
+                    { icon: '⚡', date: 'Apr 30', name: 'ZESCO payment', color: 'var(--danger)' },
+                    { icon: '📱', date: 'Apr 30', name: 'Airtel payment', color: 'var(--warn)' },
                     { icon: '◈', date: 'May 15', name: 'Chilimba payout', color: 'var(--info)' }].map((e) => (
                     <div
                       key={e.name}

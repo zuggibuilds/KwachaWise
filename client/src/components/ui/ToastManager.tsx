@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { apiGet } from '../../api/client';
 
 type ToastItem = { id: string; message: string; variant?: 'default' | 'success' | 'error'; action?: { label: string; onClick: () => void } };
 
@@ -7,27 +6,8 @@ export const ToastManager: React.FC = () => {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
 
   useEffect(() => {
-    let seen = new Set<string>();
+    const seen = new Set<string>();
 
-    async function pollReminders() {
-      try {
-        const res = await apiGet('/reminders/due');
-        const payload = res as any;
-        const items = payload.reminders || [];
-        for (const it of items) {
-          if (seen.has(it.id)) continue;
-          seen.add(it.id);
-          const id = `r-${Date.now()}-${Math.random().toString(36).slice(2,6)}`;
-          setToasts((t) => [...t, { id, message: `Reminder: ${it.title}`, variant: 'default', action: { label: 'Open', onClick: () => window.location.assign('/reminders') } }]);
-        }
-      } catch (err) {
-        // ignore polling errors
-      }
-    }
-
-    // initial poll
-    pollReminders();
-    const iv = setInterval(pollReminders, 60 * 1000);
     // SSE for real-time notifications
     const token = localStorage.getItem('kwachawise_token');
     const apiBase = import.meta.env.VITE_API_BASE_URL ?? `${window.location.protocol}//${window.location.hostname}:4000/api`;
@@ -69,7 +49,6 @@ export const ToastManager: React.FC = () => {
     return () => {
       window.removeEventListener('transaction:create_failed', onFail as EventListener);
       window.removeEventListener('recurring:create_failed', onRecurringFail as EventListener);
-      clearInterval(iv);
       if (es) es.close();
     };
   }, []);
