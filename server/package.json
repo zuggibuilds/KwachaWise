@@ -20,7 +20,7 @@
     "zod": "^3.25.76",
     "helmet": "^7.0.0",
     "express-rate-limit": "^6.7.0",
-    "pino": "^8.17.0",
+    "pino": "^10.3.1",
     "pino-http": "^8.0.0",
     "@sentry/node": "^8.55.0"
   },
