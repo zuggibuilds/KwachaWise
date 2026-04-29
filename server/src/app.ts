@@ -1,5 +1,7 @@
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import authRoutes from './routes/authRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
@@ -21,6 +23,7 @@ dotenv.config();
 
 const app = express();
 const clientOrigin = process.env.CLIENT_ORIGIN ?? 'http://localhost:5173';
+const isProd = process.env.NODE_ENV === 'production';
 
 function isAllowedDevOrigin(origin: string): boolean {
   if (origin === clientOrigin) {
@@ -35,13 +38,42 @@ function isAllowedDevOrigin(origin: string): boolean {
 app.use(
   cors({
     origin(origin, callback) {
-      if (!origin || isAllowedDevOrigin(origin)) {
+      if (!origin) {
+        callback(null, true);
+        return;
+      }
+
+      if (isProd) {
+        if (origin === clientOrigin) {
+          callback(null, true);
+          return;
+        }
+
+        callback(new Error('CORS origin not allowed'));
+        return;
+      }
+
+      if (isAllowedDevOrigin(origin)) {
         callback(null, true);
         return;
       }
 
       callback(new Error('CORS origin not allowed'));
-    }
+    },
+    credentials: false
+  })
+);
+
+// security headers
+app.use(helmet());
+
+// rate limiting
+app.use(
+  rateLimit({
+    windowMs: isProd ? 15 * 60 * 1000 : 60 * 1000,
+    max: isProd ? 200 : 60,
+    standardHeaders: true,
+    legacyHeaders: false
   })
 );
 app.use(express.json({ limit: '1mb' }));
