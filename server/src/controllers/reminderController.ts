@@ -3,7 +3,10 @@ import { createReminder, listReminders, deleteReminder, getDueReminders, updateR
 import { createReminderSchema, updateReminderSchema } from '../validators/reminderValidator.js';
 
 export async function create(req: Request, res: Response) {
-  const userId = (req as any).auth.userId as string;
+  const userId = req.user?.id;
+  if (!userId) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
   try {
     const input = createReminderSchema.parse(req.body);
     const row = createReminder(userId, input as any);
@@ -14,13 +17,19 @@ export async function create(req: Request, res: Response) {
 }
 
 export async function list(req: Request, res: Response) {
-  const userId = (req as any).auth.userId as string;
+  const userId = req.user?.id;
+  if (!userId) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
   const rows = listReminders(userId);
   res.json({ reminders: rows });
 }
 
 export async function update(req: Request, res: Response) {
-  const userId = (req as any).auth.userId as string;
+  const userId = req.user?.id;
+  if (!userId) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
   const rawId = req.params.id;
   const id = Array.isArray(rawId) ? rawId[0] : rawId;
   const patch = req.body;
@@ -37,7 +46,10 @@ export async function update(req: Request, res: Response) {
 }
 
 export async function remove(req: Request, res: Response) {
-  const userId = (req as any).auth.userId as string;
+  const userId = req.user?.id;
+  if (!userId) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
   const rawId = req.params.id;
   const id = Array.isArray(rawId) ? rawId[0] : rawId;
   try {

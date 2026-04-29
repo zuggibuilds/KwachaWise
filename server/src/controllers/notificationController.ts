@@ -3,13 +3,19 @@ import { listUnread, markRead } from '../services/notificationService.js';
 import { addClient } from '../utils/notificationBroadcaster.js';
 
 export async function list(req: Request, res: Response) {
-  const userId = (req as any).auth.userId as string;
+  const userId = req.user?.id;
+  if (!userId) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
   const rows = listUnread(userId);
   res.json({ notifications: rows });
 }
 
 export async function markAsRead(req: Request, res: Response) {
-  const userId = (req as any).auth.userId as string;
+  const userId = req.user?.id;
+  if (!userId) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
   const rawId = req.params.id;
   const id = Array.isArray(rawId) ? rawId[0] : rawId;
   markRead(userId, id);
@@ -17,7 +23,10 @@ export async function markAsRead(req: Request, res: Response) {
 }
 
 export async function stream(req: Request, res: Response) {
-  const userId = (req as any).auth.userId as string;
+  const userId = req.user?.id;
+  if (!userId) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
   // set SSE headers
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');

@@ -1,5 +1,4 @@
 import app from './app.js';
-import { migrate } from './db/migrate.js';
 import { seed } from './db/seed.js';
 import { runDue } from './services/recurringService.js';
 import { getDueReminders } from './services/reminderService.js';
@@ -8,7 +7,6 @@ import { existsNotification, createNotification } from './services/notificationS
 const port = Number(process.env.SERVER_PORT ?? 4000);
 
 async function start(): Promise<void> {
-  migrate();
   await seed();
 
   // start recurring job runner (runs every minute in dev)

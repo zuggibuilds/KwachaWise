@@ -61,6 +61,15 @@ export function updateReminder(userId: string, id: string, patch: Partial<Remind
   const updated = { ...existing, ...patch, updated_at: new Date().toISOString() } as ReminderRow;
   db.prepare(
     `UPDATE reminders SET title = @title, description = @description, amount_ngwee = @amount_ngwee, due_date = @due_date, remind_before_days = @remind_before_days, enabled = @enabled, updated_at = @updated_at WHERE id = @id`
-  ).run(updated);
+  ).run({
+    id: updated.id,
+    title: updated.title,
+    description: updated.description,
+    amount_ngwee: updated.amount_ngwee,
+    due_date: updated.due_date,
+    remind_before_days: updated.remind_before_days,
+    enabled: updated.enabled,
+    updated_at: updated.updated_at
+  });
   return updated;
 }

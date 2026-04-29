@@ -4,7 +4,10 @@ import { AppError } from '../utils/errors.js';
 import { createRecurringSchema } from '../validators/recurringValidator.js';
 
 export async function create(req: Request, res: Response) {
-  const userId = (req as any).auth.userId as string;
+  const userId = req.user?.id;
+  if (!userId) {
+    throw new AppError(401, 'UNAUTHORIZED', 'Authentication required');
+  }
   const parsed = createRecurringSchema.safeParse(req.body);
   if (!parsed.success) {
     throw new AppError(400, 'VALIDATION_ERROR', 'Invalid recurring payload', parsed.error.flatten());
@@ -15,7 +18,10 @@ export async function create(req: Request, res: Response) {
 }
 
 export async function getOne(req: Request, res: Response) {
-  const userId = (req as any).auth.userId as string;
+  const userId = req.user?.id;
+  if (!userId) {
+    throw new AppError(401, 'UNAUTHORIZED', 'Authentication required');
+  }
   const rawId = req.params.id;
   const id = Array.isArray(rawId) ? rawId[0] : rawId;
   const row = getById(userId, id);
@@ -24,13 +30,19 @@ export async function getOne(req: Request, res: Response) {
 }
 
 export async function list(req: Request, res: Response) {
-  const userId = (req as any).auth.userId as string;
+  const userId = req.user?.id;
+  if (!userId) {
+    throw new AppError(401, 'UNAUTHORIZED', 'Authentication required');
+  }
   const rows = listByUser(userId);
   res.json({ recurring: rows });
 }
 
 export async function remove(req: Request, res: Response) {
-  const userId = (req as any).auth.userId as string;
+  const userId = req.user?.id;
+  if (!userId) {
+    throw new AppError(401, 'UNAUTHORIZED', 'Authentication required');
+  }
   const rawId = req.params.id;
   const id = Array.isArray(rawId) ? rawId[0] : rawId;
   try {
