@@ -11,3 +11,5 @@ server/dist/
 *.tsbuildinfo
 server/.env
 server/data/*.sqlite
+gitleaks-report.json
+server/server-audit.json

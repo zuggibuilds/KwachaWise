@@ -1,5 +1,5 @@
 import { db } from '../db/index.js';
-import { v4 as uuid } from 'uuid';
+import { randomUUID } from 'node:crypto';
 import { AppError } from '../utils/errors.js';
 
 export type ReminderRow = {
@@ -16,7 +16,7 @@ export type ReminderRow = {
 };
 
 export function createReminder(userId: string, payload: Partial<ReminderRow>): ReminderRow {
-  const id = uuid();
+  const id = randomUUID();
   const now = new Date().toISOString();
   const row: ReminderRow = {
     id,

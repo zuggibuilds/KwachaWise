@@ -6,7 +6,13 @@ export interface AuthUser {
 }
 
 function getJwtSecret(): string {
-  return process.env.JWT_SECRET ?? 'kwachawise-dev-only-secret-change-me';
+  const secret = process.env.JWT_SECRET;
+
+  if (!secret) {
+    throw new Error('JWT_SECRET is required');
+  }
+
+  return secret;
 }
 
 export function signToken(user: AuthUser): string {

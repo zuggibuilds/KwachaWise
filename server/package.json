@@ -8,6 +8,7 @@
     "start": "node dist/server.js",
     "db:migrate": "tsx src/db/migrate.ts",
     "db:seed": "tsx src/db/seed.ts",
+    "test": "vitest run",
     "test:recurring": "tsx src/scripts/recurring_test.ts"
   },
   "dependencies": {
@@ -17,17 +18,19 @@
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "zod": "^3.25.76",
-    "uuid": "^9.0.0"
-    ,"helmet": "^7.0.0",
-    "express-rate-limit": "^6.7.0"
+    "helmet": "^7.0.0",
+    "express-rate-limit": "^6.7.0",
+    "pino": "^8.17.0",
+    "pino-http": "^8.0.0",
+    "@sentry/node": "^8.55.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.2.0",
-    "@types/uuid": "^9.0.8",
     "tsx": "^4.20.4",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
   }
 }

@@ -1,4 +1,5 @@
 import type { NextFunction, Request, Response } from 'express';
+import * as Sentry from '@sentry/node';
 import { AppError } from '../utils/errors.js';
 
 export function notFound(_req: Request, _res: Response, next: NextFunction): void {
@@ -6,6 +7,8 @@ export function notFound(_req: Request, _res: Response, next: NextFunction): voi
 }
 
 export function errorHandler(error: unknown, _req: Request, res: Response, _next: NextFunction): void {
+  Sentry.captureException(error);
+
   if (error instanceof AppError) {
     res.status(error.statusCode).json({ error: { code: error.code, message: error.message, details: error.details } });
     return;

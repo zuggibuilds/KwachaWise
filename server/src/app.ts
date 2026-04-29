@@ -3,6 +3,9 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
+import pino from 'pino';
+import pinoHttp from 'pino-http';
+import * as Sentry from '@sentry/node';
 import authRoutes from './routes/authRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
 import transactionRoutes from './routes/transactionRoutes.js';
@@ -24,6 +27,18 @@ dotenv.config();
 const app = express();
 const clientOrigin = process.env.CLIENT_ORIGIN ?? 'http://localhost:5173';
 const isProd = process.env.NODE_ENV === 'production';
+const logger = (pino as unknown as any)({ level: process.env.LOG_LEVEL ?? (isProd ? 'info' : 'debug') });
+const sentryDsn = process.env.SENTRY_DSN;
+
+if (sentryDsn) {
+  Sentry.init({
+    dsn: sentryDsn,
+    environment: process.env.NODE_ENV ?? 'development',
+    tracesSampleRate: Number(process.env.SENTRY_TRACES_SAMPLE_RATE ?? '0.1')
+  });
+}
+
+app.use((pinoHttp as unknown as any)({ logger }));
 
 function isAllowedDevOrigin(origin: string): boolean {
   if (origin === clientOrigin) {

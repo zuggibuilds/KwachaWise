@@ -1,5 +1,5 @@
 import { db } from '../db/index.js';
-import { v4 as uuid } from 'uuid';
+import { randomUUID } from 'node:crypto';
 import { broadcastToUser } from '../utils/notificationBroadcaster.js';
 
 export type NotificationRow = {
@@ -15,7 +15,7 @@ export type NotificationRow = {
 };
 
 export function createNotification(userId: string, type: string, sourceId: string | null, occurrenceDate: string | null, title: string, body?: string | null): NotificationRow {
-  const id = uuid();
+  const id = randomUUID();
   const now = new Date().toISOString();
   const row: NotificationRow = { id, user_id: userId, type, source_id: sourceId, occurrence_date: occurrenceDate, title, body: body ?? null, read: 0, created_at: now };
   db.prepare(
