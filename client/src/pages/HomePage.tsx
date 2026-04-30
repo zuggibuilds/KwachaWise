@@ -14,6 +14,14 @@ export function HomePage() {
     }
   };
 
+  const handleGetStarted = () => {
+    if (user) {
+      navigate('/app/');
+    } else {
+      navigate('/register');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
       {/* Navigation */}
@@ -40,7 +48,7 @@ export function HomePage() {
               {user ? 'Dashboard' : 'Sign in'}
             </button>
             <button
-              onClick={() => navigate('/register')}
+              onClick={handleGetStarted}
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition transform hover:scale-105"
             >
               Get Started
@@ -71,7 +79,7 @@ export function HomePage() {
 
             <div className="flex flex-col sm:flex-row gap-4">
               <button
-                onClick={() => navigate('/register')}
+                onClick={handleGetStarted}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition transform hover:scale-105 shadow-lg hover:shadow-xl"
               >
                 Try for free
@@ -227,7 +235,7 @@ export function HomePage() {
               </div>
 
               <button
-                onClick={() => navigate('/register')}
+                onClick={handleGetStarted}
                 className="mt-8 bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-bold transition transform hover:scale-105"
               >
                 Start Free Trial
@@ -286,7 +294,7 @@ export function HomePage() {
               <p className="text-slate-600 mb-6">Advanced budgeting & insights</p>
               <div className="text-4xl font-bold text-slate-900 mb-6">$4.99<span className="text-lg text-slate-600">/mo</span></div>
               <button
-                onClick={() => navigate('/register')}
+                onClick={handleGetStarted}
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-bold transition mb-6"
               >
                 Try Free
@@ -351,7 +359,7 @@ export function HomePage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
-              onClick={() => navigate('/register')}
+              onClick={handleGetStarted}
               className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition transform hover:scale-105"
             >
               Start Your Free Trial
