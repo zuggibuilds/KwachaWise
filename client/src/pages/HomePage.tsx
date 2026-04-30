@@ -1,8 +1,18 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { BarChart3, Smartphone, TrendingUp, Zap } from 'lucide-react';
+import { useAuth } from '../lib/auth';
 
 export function HomePage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const handleSignIn = () => {
+    if (user) {
+      navigate('/app/');
+    } else {
+      navigate('/login');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
@@ -23,12 +33,12 @@ export function HomePage() {
           </div>
 
           <div className="flex items-center gap-4">
-            <Link
-              to="/login"
+            <button
+              onClick={handleSignIn}
               className="hidden sm:block text-slate-600 hover:text-slate-900 font-medium transition"
             >
-              Sign in
-            </Link>
+              {user ? 'Dashboard' : 'Sign in'}
+            </button>
             <button
               onClick={() => navigate('/register')}
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition transform hover:scale-105"
@@ -67,10 +77,10 @@ export function HomePage() {
                 Try for free
               </button>
               <button
-                onClick={() => navigate('/login')}
+                onClick={handleSignIn}
                 className="border-2 border-slate-300 hover:border-slate-400 text-slate-900 px-8 py-4 rounded-lg font-bold text-lg transition flex items-center justify-center gap-2"
               >
-                <span>See demo</span>
+                <span>{user ? 'Open App' : 'See demo'}</span>
                 <span>→</span>
               </button>
             </div>
@@ -347,10 +357,10 @@ export function HomePage() {
               Start Your Free Trial
             </button>
             <button
-              onClick={() => navigate('/login')}
+              onClick={handleSignIn}
               className="border-2 border-slate-300 hover:border-slate-400 text-slate-900 px-8 py-4 rounded-lg font-bold text-lg transition"
             >
-              Sign In
+              {user ? 'Go to Dashboard' : 'Sign In'}
             </button>
           </div>
         </div>
