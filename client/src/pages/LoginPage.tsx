@@ -1,12 +1,11 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../lib/auth';
 import { AuthCard } from './AuthShared';
 
 export function LoginPage() {
   const navigate = useNavigate();
-  const { login, googleLogin } = useAuth();
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -25,16 +24,6 @@ export function LoginPage() {
       setSubmitting(false);
     }
   }
-
-  const handleGoogleSuccess = async (credentialResponse: any) => {
-    setError(null);
-    try {
-      await googleLogin(credentialResponse.credential);
-      navigate('/app/');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unable to login with Google');
-    }
-  };
 
   return (
     <AuthCard
@@ -80,24 +69,6 @@ export function LoginPage() {
         >
           {submitting ? 'Signing in...' : 'Sign in'}
         </button>
-
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-slate-300"></div>
-          </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white text-slate-500">Or</span>
-          </div>
-        </div>
-
-        <div className="flex justify-center">
-          <GoogleLogin
-            onSuccess={handleGoogleSuccess}
-            onError={() => setError('Failed to login with Google')}
-            size="large"
-            theme="outline"
-          />
-        </div>
       </form>
     </AuthCard>
   );
