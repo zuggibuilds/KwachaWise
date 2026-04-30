@@ -53,27 +53,3 @@ export async function loginUser(email: string, password: string): Promise<{ toke
   const token = signToken({ id: user.id, email: user.email });
   return { token, user: toPublicUser(user) };
 }
-
-export async function getOrCreateGoogleUser(email: string, name: string): Promise<{ token: string; user: PublicUser }> {
-  const normalizedEmail = email.toLowerCase().trim();
-  const existing = db.prepare('SELECT id, email, created_at FROM users WHERE lower(email) = lower(?)').get(normalizedEmail) as
-    | { id: string; email: string; created_at: string }
-    | undefined;
-
-  if (existing) {
-    const token = signToken({ id: existing.id, email: existing.email });
-    return { token, user: toPublicUser(existing) };
-  }
-
-  // Create new user from Google
-  const user = { id: createId(), email: normalizedEmail, password_hash: '', created_at: nowIso() };
-  db.prepare('INSERT INTO users (id, email, password_hash, created_at) VALUES (?, ?, ?, ?)').run(
-    user.id,
-    user.email,
-    user.password_hash,
-    user.created_at
-  );
-
-  const token = signToken({ id: user.id, email: user.email });
-  return { token, user: toPublicUser(user) };
-}

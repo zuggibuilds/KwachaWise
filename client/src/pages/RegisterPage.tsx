@@ -1,12 +1,11 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { GoogleLogin, CredentialResponse } from '@react-oauth/google';
 import { useAuth } from '../lib/auth';
 import { AuthCard } from './AuthShared';
 
 export function RegisterPage() {
   const navigate = useNavigate();
-  const { register, loginWithGoogle } = useAuth();
+  const { register } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -21,22 +20,6 @@ export function RegisterPage() {
       navigate('/app/');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to register');
-    } finally {
-      setSubmitting(false);
-    }
-  }
-
-  async function handleGoogleSignUp(credentialResponse: CredentialResponse) {
-    setError(null);
-    setSubmitting(true);
-    try {
-      if (!credentialResponse.credential) {
-        throw new Error('No credential received from Google');
-      }
-      await loginWithGoogle(credentialResponse.credential);
-      navigate('/app/');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unable to sign up with Google');
     } finally {
       setSubmitting(false);
     }
@@ -87,25 +70,6 @@ export function RegisterPage() {
           {submitting ? 'Creating account...' : 'Create account'}
         </button>
       </form>
-
-      <div className="mt-6 space-y-3">
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-slate-200"></div>
-          </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white text-slate-500">Or continue with</span>
-          </div>
-        </div>
-
-        <div className="flex justify-center">
-          <GoogleLogin
-            onSuccess={handleGoogleSignUp}
-            onError={() => setError('Google sign-up failed')}
-            size="large"
-          />
-        </div>
-      </div>
     </AuthCard>
   );
 }

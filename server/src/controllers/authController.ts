@@ -3,7 +3,7 @@ import { z } from 'zod';
 import jwt from 'jsonwebtoken';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { AppError } from '../utils/errors.js';
-import { loginUser, registerUser, getOrCreateGoogleUser } from '../services/authService.js';
+import { loginUser, registerUser } from '../services/authService.js';
 import { getUserById } from '../services/shared.js';
 
 const credentialsSchema = z.object({
@@ -11,8 +11,8 @@ const credentialsSchema = z.object({
   password: z.string().min(8)
 });
 
-const googleAuthSchema = z.object({
-  credential: z.string()
+const googleTokenSchema = z.object({
+  idToken: z.string()
 });
 
 export const register = asyncHandler(async (req: Request, res: Response) => {
@@ -36,28 +36,34 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const googleAuth = asyncHandler(async (req: Request, res: Response) => {
-  const parsed = googleAuthSchema.safeParse(req.body);
+  const parsed = googleTokenSchema.safeParse(req.body);
   if (!parsed.success) {
-    throw new AppError(400, 'VALIDATION_ERROR', 'Invalid Google auth payload', parsed.error.flatten());
+    throw new AppError(400, 'VALIDATION_ERROR', 'Invalid Google token payload', parsed.error.flatten());
   }
 
   try {
-    // Decode the Google ID token (without verification for now)
-    // In production, you should verify the token signature using Google's public keys
-    const decoded = jwt.decode(parsed.data.credential) as any;
+    // Decode the Google ID token without verification (in production, you should verify the signature)
+    const decoded = jwt.decode(parsed.data.idToken) as { email?: string; name?: string } | null;
     
     if (!decoded || !decoded.email) {
-      throw new AppError(401, 'INVALID_TOKEN', 'Invalid Google token');
+      throw new AppError(400, 'INVALID_TOKEN', 'Invalid Google ID token');
     }
 
-    // Get or create user
-    const result = await getOrCreateGoogleUser(decoded.email, decoded.name || decoded.email);
-    res.json({ token: result.token });
-  } catch (err) {
-    if (err instanceof AppError) {
-      throw err;
+    // Try to login existing user, or create new one
+    try {
+      const result = await loginUser(decoded.email, '');
+      res.json({ token: result.token });
+    } catch {
+      // User doesn't exist, create new one with random password
+      const randomPassword = Math.random().toString(36).slice(-12);
+      const result = await registerUser(decoded.email, randomPassword);
+      res.status(201).json({ token: result.token });
     }
-    throw new AppError(401, 'INVALID_TOKEN', 'Failed to process Google token');
+  } catch (error) {
+    if (error instanceof AppError) {
+      throw error;
+    }
+    throw new AppError(400, 'INVALID_TOKEN', 'Failed to process Google token');
   }
 });
 
