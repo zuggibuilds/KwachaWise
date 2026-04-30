@@ -15,7 +15,6 @@ import reportRoutes from './routes/reportRoutes.js';
 import payeRoutes from './routes/payeRoutes.js';
 import chilimbaRoutes from './routes/chilimbaRoutes.js';
 import recurringRoutes from './routes/recurringRoutes.js';
-import reminderRoutes from './routes/reminderRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
 import { me } from './controllers/authController.js';
@@ -108,7 +107,6 @@ app.use('/api/reports', reportRoutes);
 app.use('/api/paye', payeRoutes);
 app.use('/api/chilimba', chilimbaRoutes);
 app.use('/api/recurring', recurringRoutes);
-app.use('/api/reminders', reminderRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/ai', aiRoutes);
 
