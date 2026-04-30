@@ -17,7 +17,7 @@ export function RegisterPage() {
     setSubmitting(true);
     try {
       await register(email, password);
-      navigate('/');
+      navigate('/app/');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to register');
     } finally {

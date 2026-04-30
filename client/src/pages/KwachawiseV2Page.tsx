@@ -147,65 +147,68 @@ function getInitialsFromEmail(email?: string | null): string {
 
 function pathToPageId(pathname: string): V2PageId {
   const path = pathname.toLowerCase();
-  if (path === '/' || path === '/dashboard') return 'dashboard';
-  if (path.startsWith('/accounts')) return 'accounts';
-  if (path.startsWith('/transactions')) return 'transactions';
-  if (path.startsWith('/budgets')) return 'budgets';
-  if (path.startsWith('/goals')) return 'goals';
-  if (path.startsWith('/chilimba')) return 'chilimba';
-  if (path.startsWith('/paye')) return 'paye';
-  if (path.startsWith('/bills')) return 'transactions';
-  if (path.startsWith('/recurring')) return 'recurring';
-  if (path.startsWith('/debt')) return 'debt';
-  if (path.startsWith('/networth')) return 'networth';
-  if (path.startsWith('/currency')) return 'currency';
-  if (path.startsWith('/invest')) return 'invest';
-  if (path.startsWith('/ai')) return 'ai';
-  if (path.startsWith('/calendar')) return 'calendar';
-  if (path.startsWith('/challenges')) return 'challenges';
-  if (path.startsWith('/shared')) return 'shared';
-  if (path.startsWith('/reports')) return 'reports';
+  // Remove /app prefix if present
+  const cleanPath = path.replace(/^\/app/, '') || '/';
+  
+  if (cleanPath === '/' || cleanPath === '/dashboard') return 'dashboard';
+  if (cleanPath.startsWith('/accounts')) return 'accounts';
+  if (cleanPath.startsWith('/transactions')) return 'transactions';
+  if (cleanPath.startsWith('/budgets')) return 'budgets';
+  if (cleanPath.startsWith('/goals')) return 'goals';
+  if (cleanPath.startsWith('/chilimba')) return 'chilimba';
+  if (cleanPath.startsWith('/paye')) return 'paye';
+  if (cleanPath.startsWith('/bills')) return 'transactions';
+  if (cleanPath.startsWith('/recurring')) return 'recurring';
+  if (cleanPath.startsWith('/debt')) return 'debt';
+  if (cleanPath.startsWith('/networth')) return 'networth';
+  if (cleanPath.startsWith('/currency')) return 'currency';
+  if (cleanPath.startsWith('/invest')) return 'invest';
+  if (cleanPath.startsWith('/ai')) return 'ai';
+  if (cleanPath.startsWith('/calendar')) return 'calendar';
+  if (cleanPath.startsWith('/challenges')) return 'challenges';
+  if (cleanPath.startsWith('/shared')) return 'shared';
+  if (cleanPath.startsWith('/reports')) return 'reports';
   return 'dashboard';
 }
 
 function pageIdToPath(pageId: V2PageId): string {
   switch (pageId) {
     case 'dashboard':
-      return '/';
+      return '/app/';
     case 'accounts':
-      return '/accounts';
+      return '/app/accounts';
     case 'transactions':
-      return '/transactions';
+      return '/app/transactions';
     case 'budgets':
-      return '/budgets';
+      return '/app/budgets';
     case 'goals':
-      return '/goals';
+      return '/app/goals';
     case 'chilimba':
-      return '/chilimba';
+      return '/app/chilimba';
     case 'paye':
-      return '/paye';
+      return '/app/paye';
     case 'bills':
-      return '/transactions';
+      return '/app/transactions';
     case 'recurring':
-      return '/recurring';
+      return '/app/recurring';
     case 'debt':
-      return '/debt';
+      return '/app/debt';
     case 'networth':
-      return '/networth';
+      return '/app/networth';
     case 'currency':
-      return '/currency';
+      return '/app/currency';
     case 'invest':
-      return '/invest';
+      return '/app/invest';
     case 'ai':
-      return '/ai';
+      return '/app/ai';
     case 'calendar':
-      return '/calendar';
+      return '/app/calendar';
     case 'challenges':
-      return '/challenges';
+      return '/app/challenges';
     case 'shared':
-      return '/shared';
+      return '/app/shared';
     case 'reports':
-      return '/reports';
+      return '/app/reports';
   }
 }
 
