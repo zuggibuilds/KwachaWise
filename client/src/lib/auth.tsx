@@ -6,6 +6,7 @@ interface AuthContextValue {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
+  loginWithGoogle: (credential: string) => Promise<void>;
   register: (email: string, password: string) => Promise<void>;
   logout: () => void;
 }
@@ -40,11 +41,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(profile.user);
   }
 
+  async function applyGoogleAuth(credential: string): Promise<void> {
+    const response = await apiPost<{ token: string }>('/auth/google', { credential });
+    setToken(response.token);
+    const profile = await apiGet<{ user: User }>('/me');
+    setUser(profile.user);
+  }
+
   const value = useMemo<AuthContextValue>(
     () => ({
       user,
       loading,
       login: (email, password) => applyAuth(email, password, 'login'),
+      loginWithGoogle: applyGoogleAuth,
       register: (email, password) => applyAuth(email, password, 'register'),
       logout: () => {
         setToken(null);
