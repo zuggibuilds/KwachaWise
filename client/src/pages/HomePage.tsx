@@ -1,4 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { BarChart3, Smartphone, TrendingUp, Zap } from 'lucide-react';
 import { useAuth } from '../lib/auth';
 
@@ -15,11 +16,55 @@ export function HomePage() {
   };
 
   const handleGetStarted = () => {
-    if (user) {
-      navigate('/app/');
-    } else {
-      navigate('/register');
-    }
+    navigate('/login');
+  };
+
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.8, ease: 'easeOut' },
+    },
+  };
+
+  const slideInVariants = {
+    hidden: { opacity: 0, x: -50 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: { duration: 0.8, ease: 'easeOut' },
+    },
+  };
+
+  const slideInRightVariants = {
+    hidden: { opacity: 0, x: 50 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: { duration: 0.8, ease: 'easeOut' },
+    },
+  };
+
+  const scaleInVariants = {
+    hidden: { opacity: 0, scale: 0.8 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: { duration: 0.8, ease: 'easeOut' },
+    },
   };
 
   return (
@@ -61,7 +106,12 @@ export function HomePage() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           {/* Left Content */}
-          <div>
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={slideInVariants}
+          >
             <div className="inline-block mb-6 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
               ✨ New: AI-Powered Insights
             </div>
@@ -104,10 +154,15 @@ export function HomePage() {
                 <p className="text-sm text-slate-600 mt-1">Transactions Tracked</p>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Right Visual */}
-          <div className="relative">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={slideInRightVariants}
+            className="relative">
             <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-blue-600/20 rounded-3xl blur-3xl"></div>
             <div className="relative bg-white rounded-3xl shadow-2xl p-8 border border-slate-100">
               <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl h-64 flex items-center justify-center mb-6">
@@ -118,21 +173,33 @@ export function HomePage() {
                 Visualize your spending patterns and make smarter financial decisions with real-time insights.
               </p>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* Features Section */}
       <section id="features" className="bg-white py-20 border-t border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-slate-900 mb-4">Powerful Features</h2>
-            <p className="text-xl text-slate-600">Everything you need to manage your money effectively</p>
-          </div>
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={containerVariants}
+            className="text-center mb-16"
+          >
+            <motion.h2 variants={itemVariants} className="text-4xl font-bold text-slate-900 mb-4">Powerful Features</motion.h2>
+            <motion.p variants={itemVariants} className="text-xl text-slate-600">Everything you need to manage your money effectively</motion.p>
+          </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={containerVariants}
+            className="grid md:grid-cols-2 lg:grid-cols-4 gap-8"
+          >
             {/* Feature 1 */}
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100/50 p-8 rounded-2xl border border-blue-200/50">
+            <motion.div variants={itemVariants} className="bg-gradient-to-br from-blue-50 to-blue-100/50 p-8 rounded-2xl border border-blue-200/50">
               <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mb-4">
                 <BarChart3 className="w-6 h-6 text-white" />
               </div>
@@ -140,10 +207,10 @@ export function HomePage() {
               <p className="text-slate-600">
                 Understand your spending with detailed charts and insights about your financial habits.
               </p>
-            </div>
+            </motion.div>
 
             {/* Feature 2 */}
-            <div className="bg-gradient-to-br from-green-50 to-green-100/50 p-8 rounded-2xl border border-green-200/50">
+            <motion.div variants={itemVariants} className="bg-gradient-to-br from-green-50 to-green-100/50 p-8 rounded-2xl border border-green-200/50">
               <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center mb-4">
                 <TrendingUp className="w-6 h-6 text-white" />
               </div>
@@ -151,10 +218,10 @@ export function HomePage() {
               <p className="text-slate-600">
                 Set and monitor budgets for different categories to stay within your spending goals.
               </p>
-            </div>
+            </motion.div>
 
             {/* Feature 3 */}
-            <div className="bg-gradient-to-br from-purple-50 to-purple-100/50 p-8 rounded-2xl border border-purple-200/50">
+            <motion.div variants={itemVariants} className="bg-gradient-to-br from-purple-50 to-purple-100/50 p-8 rounded-2xl border border-purple-200/50">
               <div className="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center mb-4">
                 <Smartphone className="w-6 h-6 text-white" />
               </div>
@@ -162,10 +229,10 @@ export function HomePage() {
               <p className="text-slate-600">
                 Track expenses on the go with our intuitive mobile app. Sync across all devices seamlessly.
               </p>
-            </div>
+            </motion.div>
 
             {/* Feature 4 */}
-            <div className="bg-gradient-to-br from-orange-50 to-orange-100/50 p-8 rounded-2xl border border-orange-200/50">
+            <motion.div variants={itemVariants} className="bg-gradient-to-br from-orange-50 to-orange-100/50 p-8 rounded-2xl border border-orange-200/50">
               <div className="w-12 h-12 bg-orange-600 rounded-lg flex items-center justify-center mb-4">
                 <Zap className="w-6 h-6 text-white" />
               </div>
@@ -173,8 +240,8 @@ export function HomePage() {
               <p className="text-slate-600">
                 Get personalized recommendations and smart insights powered by artificial intelligence.
               </p>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
       </section>
 
@@ -255,14 +322,26 @@ export function HomePage() {
       {/* Pricing / How it Works Section */}
       <section id="pricing" className="bg-white py-20 border-t border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-slate-900 mb-4">Simple Pricing</h2>
-            <p className="text-xl text-slate-600">Choose what works best for you</p>
-          </div>
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={containerVariants}
+            className="text-center mb-12"
+          >
+            <motion.h2 variants={itemVariants} className="text-4xl font-bold text-slate-900 mb-4">Simple Pricing</motion.h2>
+            <motion.p variants={itemVariants} className="text-xl text-slate-600">Choose what works best for you</motion.p>
+          </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={containerVariants}
+            className="grid md:grid-cols-3 gap-8"
+          >
             {/* Free Plan */}
-            <div className="border border-slate-200 rounded-2xl p-8 hover:shadow-lg transition">
+            <motion.div variants={scaleInVariants} className="border border-slate-200 rounded-2xl p-8 hover:shadow-lg transition">
               <h3 className="text-2xl font-bold text-slate-900 mb-2">Free</h3>
               <p className="text-slate-600 mb-6">Start tracking your finances</p>
               <div className="text-4xl font-bold text-slate-900 mb-6">$0<span className="text-lg text-slate-600">/mo</span></div>
@@ -283,10 +362,10 @@ export function HomePage() {
                   <span className="text-slate-600">Mobile app access</span>
                 </li>
               </ul>
-            </div>
+            </motion.div>
 
             {/* Pro Plan */}
-            <div className="border-2 border-blue-600 rounded-2xl p-8 transform scale-105 shadow-xl relative">
+            <motion.div variants={scaleInVariants} className="border-2 border-blue-600 rounded-2xl p-8 transform scale-105 shadow-xl relative">
               <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                 <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-bold">Popular</span>
               </div>
@@ -317,10 +396,10 @@ export function HomePage() {
                   <span className="text-slate-600">Priority support</span>
                 </li>
               </ul>
-            </div>
+            </motion.div>
 
             {/* Enterprise Plan */}
-            <div className="border border-slate-200 rounded-2xl p-8 hover:shadow-lg transition">
+            <motion.div variants={scaleInVariants} className="border border-slate-200 rounded-2xl p-8 hover:shadow-lg transition">
               <h3 className="text-2xl font-bold text-slate-900 mb-2">Business</h3>
               <p className="text-slate-600 mb-6">For teams & organizations</p>
               <div className="text-4xl font-bold text-slate-900 mb-6">Custom<span className="text-lg text-slate-600">/mo</span></div>
@@ -345,19 +424,25 @@ export function HomePage() {
                   <span className="text-slate-600">Dedicated support</span>
                 </li>
               </ul>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
       </section>
 
       {/* CTA Section */}
       <section className="py-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold text-slate-900 mb-6">Ready to Take Control?</h2>
-          <p className="text-xl text-slate-600 mb-8">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={containerVariants}
+          className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center"
+        >
+          <motion.h2 variants={itemVariants} className="text-4xl font-bold text-slate-900 mb-6">Ready to Take Control?</motion.h2>
+          <motion.p variants={itemVariants} className="text-xl text-slate-600 mb-8">
             Join thousands of people managing their finances smarter with KwachaWise.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          </motion.p>
+          <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
               onClick={handleGetStarted}
               className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition transform hover:scale-105"
@@ -370,8 +455,8 @@ export function HomePage() {
             >
               {user ? 'Go to Dashboard' : 'Sign In'}
             </button>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </section>
 
       {/* Footer */}
