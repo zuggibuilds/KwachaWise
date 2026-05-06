@@ -10,7 +10,7 @@ export function CategoryPieChart({ items }: { items: Item[] }) {
   return (
     <Pie
       data={{
-        labels: items.map((item) => item.categoryName),
+        labels: items.map((item) => `${item.categoryName}\nK${(item.expense_ngwee / 100).toFixed(0)}`),
         datasets: [
           {
             label: 'Expenses',
@@ -20,9 +20,24 @@ export function CategoryPieChart({ items }: { items: Item[] }) {
         ]
       }}
       options={{
+        responsive: true,
+        maintainAspectRatio: false,
         plugins: {
           legend: {
-            position: 'bottom'
+            position: 'bottom' as const,
+            labels: {
+              font: {
+                size: 12
+              },
+              padding: 15
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context: any) {
+                return 'K' + context.parsed.y.toFixed(0);
+              }
+            }
           }
         }
       }}

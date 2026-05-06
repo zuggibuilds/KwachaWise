@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KwachaWise — Smart Finance for Zambia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+/* Styles (extended, keeping original tone) */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--green:#00C896;--green2:#00a87e;--gold:#C8A000;--dark:#060d0a;--t1:#f0faf5;--t2:#7da892;--t3:#3d5a4a;--border:rgba(0,200,150,.12);--font-display:'Syne',sans-serif;--font:'DM Sans',sans-serif;--mono:'DM Mono',monospace}
+html,body{height:100%}
+body{font-family:var(--font);background:#0d1117;color:var(--t1);-webkit-font-smoothing:antialiased}
+
+/* Page entrance */
+body.fade-in{animation:pageFade .6s ease both}
+@keyframes pageFade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+#auth-overlay{position:fixed;inset:0;background:var(--dark);display:flex;align-items:stretch}
+.auth-left{flex:1;padding:48px;display:flex;flex-direction:column;justify-content:center;gap:18px;position:relative;overflow:hidden}
+.auth-right{width:460px;padding:42px;background:#122219;border-left:1px solid var(--border);display:flex;flex-direction:column;justify-content:center}
+.auth-logo-mark{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--green),var(--green2));display:flex;align-items:center;justify-content:center;color:#060d0a;font-weight:800}
+.brand-row{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+
+/* NEW: Animated gradient background */
+.bg-animated{position:absolute;inset:-20%;background:linear-gradient(120deg,rgba(0,200,150,.06),rgba(200,160,0,.04),rgba(0,136,204,.03));filter:blur(40px);transform:rotate(6deg);opacity:.9;animation:drift 12s linear infinite;pointer-events:none}
+@keyframes drift{0%{transform:translate(-2%,0) rotate(0)}50%{transform:translate(2%,2%) rotate(2deg)}100%{transform:translate(-2%,0) rotate(0)}}
+
+/* Hero */
+.hero-title{font-size:44px;line-height:1.05;margin-bottom:6px;font-weight:800}
+.hero-accent{background:linear-gradient(135deg,var(--green),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-sub{color:var(--t2);max-width:560px;font-size:15px}
+
+/* NEW: CTAs */
+.cta-row{display:flex;gap:12px;margin-top:10px}
+.btn{padding:10px 16px;border-radius:10px;font-weight:700;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.btn-primary{background:linear-gradient(135deg,var(--green),var(--green2));color:#06110a;border:none}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,200,150,.14)}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--t1)}
+.btn-outline:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(255,255,255,.03)}
+
+/* NEW: Trust indicators */
+.trust-row{display:flex;gap:12px;margin-top:12px;align-items:center}
+.trust-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.02);border:1px solid var(--border);font-size:13px;color:var(--t2)}
+
+/* NEW: Feature cards */
+.features{display:flex;gap:12px;margin-top:18px}
+.feature-card{background:rgba(255,255,255,.02);border:1px solid var(--border);padding:12px;border-radius:12px;flex:1;min-width:140px}
+.feature-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;background:rgba(255,255,255,.03);margin-bottom:8px}
+.feature-title{font-weight:700;font-size:13px;margin-bottom:6px}
+.feature-desc{font-size:12px;color:var(--t2)}
+
+/* Form styles + micro interactions */
+.google-btn{width:100%;padding:12px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+.google-btn:hover{transform:translateY(-3px)}
+.auth-input{width:100%;padding:12px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.02);color:var(--t1);margin-bottom:12px;transition:box-shadow .15s,border-color .15s}
+.auth-input:focus{outline:none;box-shadow:0 6px 18px rgba(0,200,150,.08);border-color:rgba(0,200,150,.6)}
+.auth-submit{width:100%;padding:12px;border-radius:10px;background:linear-gradient(135deg,var(--green),var(--green2));border:none;color:#060d0a;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:10px}
+.auth-submit.loading{opacity:.9;pointer-events:none}
+.spinner{width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,.12);border-top-color:#fff;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.form-links{display:flex;justify-content:space-between;margin-top:10px;font-size:13px}
+.form-links a{color:var(--t2);text-decoration:none}
+.form-links a:hover{color:var(--green)}
+
+.validation{color:#ff9b9b;background:rgba(226,75,74,.06);padding:8px;border-radius:8px;border:1px solid rgba(226,75,74,.12);font-size:13px;margin-top:8px;display:none}
+
+/* Localization touch */
+.local-note{font-size:12px;color:var(--t2);margin-top:14px}
+
+/* Footer */
+.site-footer{padding:18px 24px;background:transparent;border-top:1px solid rgba(255,255,255,.03);display:flex;justify-content:space-between;align-items:center;margin-top:24px}
+.site-footer a{color:var(--t2);text-decoration:none;margin-left:12px}
+.site-footer a:hover{color:var(--green)}
+
+/* Dashboard small styles (kept) */
+.app{display:grid;grid-template-columns:210px 1fr;min-height:100vh;max-width:1200px;margin:0 auto}
+.sidebar{background:#161b22;padding:12px;border-right:1px solid #30363d}
+.main{padding:16px}
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:12px}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+.stat-card{background:#0f1620;padding:12px;border-radius:12px;border:1px solid #30363d}
+.card-title{font-weight:600;margin-bottom:6px}
+.ai-card{background:linear-gradient(135deg,rgba(0,200,150,.05),rgba(0,136,204,.03));padding:12px;border-radius:12px;border:1px solid rgba(0,200,150,.12)}
+</style>
+</head>
+<body>
+<div id="auth-overlay">
+  <div class="auth-left">
+    <div class="bg-animated" aria-hidden="true"></div>
+    <div class="brand-row">
+      <div class="auth-logo-mark">K</div>
+      <div style="font-weight:700;font-size:20px">KwachaWise</div>
+    </div>
+
+    <!-- HERO -->
+    <h1 class="hero-title">Smart money.<br><span class="hero-accent">Zambian</span><br>heart.</h1>
+    <p class="hero-sub">Manage Chilimba, PAYE, budgets, and more — all in one place, built for Zambia.</p>
+    <!-- NEW: stronger subheading -->
+    <p class="hero-sub" style="margin-top:6px;font-weight:600">Track your money, manage PAYE, and grow your finances — built for Zambia.</p>
+
+    <!-- NEW: CTA buttons -->
+    <div class="cta-row">
+      <button class="btn btn-primary" onclick="enterDemo()">Get Started</button>
+      <button class="btn btn-outline" onclick="scrollToFeatures()">Learn More</button>
+    </div>
+
+    <!-- NEW: Trust Indicators -->
+    <div class="trust-row" aria-hidden="true">
+      <div class="trust-badge">🔒 Secure & encrypted</div>
+      <div class="trust-badge">🇿🇲 Built for Zambia</div>
+      <div class="trust-badge">💳 Supports mobile money</div>
+    </div>
+
+    <!-- NEW: Product preview / features -->
+    <div class="features" id="features">
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <div class="feature-title">Budget Tracking</div>
+        <div class="feature-desc">Visualize income, expenses, and stick to savings goals.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">≡</div>
+        <div class="feature-title">PAYE Calculator</div>
+        <div class="feature-desc">Accurate ZRA PAYE, NAPSA and NHIMA calculations for payroll.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">◈</div>
+        <div class="feature-title">Chilimba Management</div>
+        <div class="feature-desc">Run rotating savings groups digitally with reminders and tracking.</div>
+      </div>
+    </div>
+
+    <div class="local-note">All values in ZMW (K)</div>
+  </div>
+  <div class="auth-right">
+    <div class="auth-form-title">Welcome back</div>
+    <div class="auth-form-sub">Sign in to your KwachaWise account and take control of your Kwacha.</div>
+    <button class="google-btn" onclick="handleGoogleSignIn()">
+      <svg class="google-icon" width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+      </svg>
+      <span style="margin-left:8px">Continue with Google</span>
+    </button>
+    <div style="display:flex;align-items:center;gap:8px;margin:12px 0"><div style="flex:1;height:1px;background:rgba(255,255,255,.04)"></div><div style="font-size:12px;color:var(--t3)">or</div><div style="flex:1;height:1px;background:rgba(255,255,255,.04)"></div></div>
+    <input class="auth-input" id="si-email" placeholder="you@example.com" autocomplete="username" aria-label="Email address">
+    <input class="auth-input" id="si-password" type="password" placeholder="Password" autocomplete="current-password" aria-label="Password">
+
+    <!-- NEW: validation message -->
+    <div id="validation" class="validation" role="alert" aria-live="assertive">Invalid email or password</div>
+
+    <!-- NEW: submit with loading state -->
+    <button class="auth-submit" id="submitBtn" onclick="doSignIn()" aria-label="Sign in">
+      <div id="submitSpinner" class="spinner" style="display:none" aria-hidden="true"></div>
+      <span id="submitText">Sign In to KwachaWise</span>
+    </button>
+
+    <!-- NEW: form helper links -->
+    <div class="form-links">
+      <a href="#" onclick="forgotPassword(event)">Forgot password?</a>
+      <a href="#" onclick="createAccount(event)">Create account</a>
+    </div>
+  </div>
+</div>
+
+<!-- Minimal dashboard visible after dismissing auth (demo) -->
+<div class="app" id="app" style="display:none">
+  <div class="sidebar">
+    <div style="font-weight:700;padding:8px 6px">KwachaWise</div>
+    <div style="margin-top:12px">
+      <div style="padding:8px;border-radius:8px;background:#0f1620;margin-bottom:6px">Dashboard</div>
+      <div style="padding:8px;border-radius:8px">Accounts</div>
+      <div style="padding:8px;border-radius:8px">Transactions</div>
+    </div>
+  </div>
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <div style="font-weight:700;font-size:18px">Dashboard</div>
+        <div style="color:var(--t2);font-size:12px">Good morning, Knowledge — May 6, 2026</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <input style="padding:8px;border-radius:8px;border:1px solid #30363d;background:#0f1620;color:var(--t1)" placeholder="Search transactions...">
+        <div style="padding:8px;border-radius:8px;background:#0f1620">Sync</div>
+        <button onclick="enterDemo()" style="padding:8px 12px;border-radius:8px;background:#0f1620;border:1px solid #30363d;color:var(--t2);cursor:pointer;font-size:13px">← Back</button>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card"><div class="card-title">Income</div><div style="font-weight:700">K 8,450</div></div>
+      <div class="stat-card"><div class="card-title">Expenses</div><div style="font-weight:700">K 3,210</div></div>
+      <div class="stat-card"><div class="card-title">Net</div><div style="font-weight:700">K 5,240</div></div>
+      <div class="stat-card"><div class="card-title">Savings</div><div style="font-weight:700">K 1,200</div></div>
+    </div>
+
+    <div class="ai-card">
+      <div style="font-weight:700;margin-bottom:6px">Wisa — Your financial assistant</div>
+      <div style="color:var(--t2);font-size:13px">Try asking: "How can I save K500/month?"</div>
+    </div>
+
+    <div class="site-footer" role="contentinfo">
+      <div style="color:var(--t2);font-size:13px">© 2026 KwachaWise</div>
+      <div>
+        <a href="#" onclick="openAbout(event)">About</a>
+        <a href="#" onclick="openContact(event)">Contact</a>
+        <a href="#" onclick="openPrivacy(event)">Privacy Policy</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* Keep existing behavior but add validation, loading, and helper handlers */
+
+// small helpers
+function showValidation(msg){
+  const el = document.getElementById('validation');
+  if(!el) return;
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+function hideValidation(){
+  const el = document.getElementById('validation');
+  if(!el) return;
+  el.style.display = 'none';
+}
+
+// sign-in flow with validation and loading state
+function doSignIn(){
+  hideValidation();
+  const email = document.getElementById('si-email').value.trim();
+  const pass = document.getElementById('si-password').value || '';
+  const submitBtn = document.getElementById('submitBtn');
+  const spinner = document.getElementById('submitSpinner');
+  const submitText = document.getElementById('submitText');
+
+  // Basic validation (non-blocking for demo)
+  if(!email || !email.includes('@') || pass.length < 6){
+    showValidation('Invalid email or password');
+    return;
+  }
+
+  // show loading state
+  submitBtn.classList.add('loading');
+  spinner.style.display = 'inline-block';
+  submitText.textContent = 'Signing in...';
+
+  // Simulate async auth; keep behavior: hide overlay and show app
+  setTimeout(function(){
+    // restore button
+    submitBtn.classList.remove('loading');
+    spinner.style.display = 'none';
+    submitText.textContent = 'Sign In to KwachaWise';
+
+    // For demo, sign in successful -> launch app
+    launchApp('Welcome back! You are now signed in to KwachaWise.', email);
+  }, 1400);
+}
+
+// existing simple Google sign-in demo
+function handleGoogleSignIn(){ 
+  // simulate a lighter Google flow
+  const submitBtn = document.getElementById('submitBtn');
+  const spinner = document.getElementById('submitSpinner');
+  const submitText = document.getElementById('submitText');
+  submitBtn.classList.add('loading');
+  spinner.style.display = 'inline-block';
+  submitText.textContent = 'Connecting...';
+  setTimeout(function(){
+    submitBtn.classList.remove('loading');
+    spinner.style.display = 'none';
+    submitText.textContent = 'Sign In to KwachaWise';
+    launchApp('Signed in with Google! Welcome to KwachaWise.', 'google-user@demo');
+  }, 1200);
+}
+
+// Demo launcher and overlay hide (keeps old behavior)
+function launchApp(message, userEmail){
+  var overlay = document.getElementById('auth-overlay');
+  overlay.style.transition = 'opacity .45s ease, transform .45s ease';
+  overlay.style.opacity = '0';
+  overlay.style.transform = 'scale(1.02)';
+  setTimeout(function(){
+    overlay.style.display = 'none';
+    document.getElementById('app').style.display = 'grid';
+    showToast(message);
+    // optional: populate demo user details in the UI
+  }, 420);
+}
+
+function enterDemo(){
+  // Check if we're already in the app - if so, logout; if not, launch app
+  var app = document.getElementById('app');
+  var overlay = document.getElementById('auth-overlay');
+  
+  if(app.style.display === 'grid'){
+    // Already in app - logout back to login
+    logout();
+  } else {
+    // Not in app - launch demo
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.classList.add('loading');
+    setTimeout(function(){
+      submitBtn.classList.remove('loading');
+      launchApp('Demo mode active — explore all features freely!', 'demo@kwachawise.app');
+    }, 900);
+  }
+}
+
+function scrollToFeatures(){
+  const el = document.getElementById('features');
+  if(!el) return;
+  // smooth scroll-left panel won't scroll page, so briefly pulse features
+  el.style.transition = 'box-shadow .4s';
+  el.style.boxShadow = '0 12px 40px rgba(0,200,150,.08)';
+  setTimeout(()=>el.style.boxShadow='',450);
+}
+
+// helper links behavior (non-destructive, demo)
+function forgotPassword(e){
+  e.preventDefault();
+  showValidation('Password reset link would be sent (demo).');
+  setTimeout(hideValidation, 2500);
+}
+function createAccount(e){
+  e.preventDefault();
+  showValidation('Account creation flow is demo-only here.');
+  setTimeout(hideValidation, 2200);
+}
+
+// footer handlers (demo)
+function openAbout(e){ e && e.preventDefault(); showToast('About — KwachaWise: Built for Zambia'); }
+function openContact(e){ e && e.preventDefault(); showToast('Contact — hello@kwachawise.app'); }
+function openPrivacy(e){ e && e.preventDefault(); showToast('Privacy Policy — demo copy'); }
+
+// small toast for feedback
+function showToast(msg){
+  var toast = document.createElement('div');
+  toast.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-60px);background:linear-gradient(135deg,#00C896,#00a87e);color:#060d0a;padding:12px 22px;border-radius:10px;font-size:13px;font-weight:600;z-index:99998;transition:transform .4s cubic-bezier(.34,1.56,.64,1);box-shadow:0 8px 32px rgba(0,200,150,.4);font-family:"DM Sans",sans-serif;white-space:nowrap';
+  toast.textContent = '✓ ' + msg;
+  document.body.appendChild(toast);
+  setTimeout(function(){ toast.style.transform = 'translateX(-50%) translateY(0)'; }, 50);
+  setTimeout(function(){ toast.style.transform = 'translateX(-50%) translateY(-60px)'; toast.style.opacity='0'; setTimeout(()=>toast.remove(),400); }, 3800);
+}
+
+// accessibility: hide validation if inputs change
+document.addEventListener('input', function(e){
+  if(e.target && (e.target.id==='si-email' || e.target.id==='si-password')){
+    hideValidation();
+  }
+});
+
+// keep previous minimal demo behavior available
+function doSignIn_original(){
+  document.getElementById('auth-overlay').style.display='none';
+  document.getElementById('app').style.display='grid';
+}
+
+// logout to return to login
+function logout(){
+  var app = document.getElementById('app');
+  var overlay = document.getElementById('auth-overlay');
+  app.style.transition = 'opacity .3s ease';
+  app.style.opacity = '0';
+  setTimeout(function(){
+    app.style.display = 'none';
+    app.style.opacity = '1';
+    overlay.style.display = 'flex';
+    overlay.style.opacity = '1';
+    overlay.style.transform = 'scale(1)';
+    // clear form
+    document.getElementById('si-email').value = '';
+    document.getElementById('si-password').value = '';
+    hideValidation();
+    showToast('You have been logged out.');
+  }, 300);
+}
+</script>
+</body>
+</html>

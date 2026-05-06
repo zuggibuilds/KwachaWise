@@ -1,6 +1,19 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
+import TransactionSheet from '../components/domain/TransactionSheet';
+import { DailyTrendChart } from '../components/charts/DailyTrendChart';
+import { CategoryPieChart } from '../components/charts/CategoryPieChart';
+import { apiGet, apiPost } from '../api/client';
+import type { Category } from '../lib/types';
+import {
+  ShoppingBag, Briefcase, Zap, UtensilsCrossed, Bus, Smartphone, Heart,
+  TrendingDown, Trophy, Calculator, Home, BarChart3, User, CreditCard,
+  Building2, Target, Scale, TrendingUp, Cpu, Calendar, Sparkles, Users,
+  FileText, Plus, Wallet, Clock, AlertCircle, DollarSign, Eye, EyeOff,
+  LogOut, Menu, Landmark, PiggyBank, ReceiptText, Tv, ShieldCheck, Plane,
+  CalendarDays, Ban, Dumbbell, Repeat
+} from 'lucide-react';
 
 type V2PageId =
   | 'dashboard'
@@ -131,6 +144,81 @@ function formatK(value: number): string {
   return `K ${value.toLocaleString()}`;
 }
 
+function getCategoryIcon(categoryName: string) {
+  const name = categoryName?.toLowerCase() || '';
+  if (name.includes('grocery') || name.includes('shop')) return ShoppingBag;
+  if (name.includes('salary') || name.includes('income') || name.includes('freelance')) return Briefcase;
+  if (name.includes('utility') || name.includes('electric') || name.includes('zesco') || name.includes('water')) return Zap;
+  if (name.includes('dining') || name.includes('restaurant') || name.includes('food')) return UtensilsCrossed;
+  if (name.includes('transport') || name.includes('uber') || name.includes('taxi') || name.includes('bus')) return Bus;
+  if (name.includes('phone') || name.includes('airtel') || name.includes('mobile') || name.includes('data')) return Smartphone;
+  if (name.includes('health') || name.includes('medical') || name.includes('medicine')) return Heart;
+  if (name.includes('clothing') || name.includes('dress') || name.includes('fashion')) return ShoppingBag;
+  if (name.includes('entertainment') || name.includes('movie') || name.includes('game')) return Sparkles;
+  return Wallet;
+}
+
+function getAccountIcon(accountName: string) {
+  const name = accountName.toLowerCase();
+  if (name.includes('zanaco') || name.includes('bank')) return Landmark;
+  if (name.includes('stanbic') || name.includes('savings')) return PiggyBank;
+  if (name.includes('airtel') || name.includes('wallet') || name.includes('mobile')) return Smartphone;
+  if (name.includes('cash')) return Wallet;
+  return CreditCard;
+}
+
+function getRecurringIcon(itemName: string) {
+  const name = itemName.toLowerCase();
+  if (name.includes('salary') || name.includes('income') || name.includes('freelance')) return Briefcase;
+  if (name.includes('rent') || name.includes('house')) return Home;
+  if (name.includes('airtel') || name.includes('phone') || name.includes('data')) return Smartphone;
+  if (name.includes('dstv') || name.includes('tv') || name.includes('stream')) return Tv;
+  if (name.includes('gym') || name.includes('fitness')) return Dumbbell;
+  return Repeat;
+}
+
+function getBillIcon(billName: string) {
+  const name = billName.toLowerCase();
+  if (name.includes('zesco') || name.includes('electric')) return Zap;
+  if (name.includes('airtel') || name.includes('phone') || name.includes('mobile')) return Smartphone;
+  if (name.includes('rent') || name.includes('house')) return Home;
+  if (name.includes('dstv') || name.includes('tv')) return Tv;
+  if (name.includes('gym') || name.includes('fitness')) return Dumbbell;
+  return ReceiptText;
+}
+
+function getAssetIcon(assetName: string) {
+  const name = assetName.toLowerCase();
+  if (name.includes('zanaco') || name.includes('bank')) return Landmark;
+  if (name.includes('savings')) return PiggyBank;
+  if (name.includes('airtel') || name.includes('mobile')) return Smartphone;
+  if (name.includes('cash')) return Wallet;
+  return TrendingUp;
+}
+
+function getGoalIcon(goalName: string) {
+  const name = goalName.toLowerCase();
+  if (name.includes('emergency') || name.includes('fund')) return ShieldCheck;
+  if (name.includes('laptop') || name.includes('work')) return Briefcase;
+  if (name.includes('holiday') || name.includes('trip') || name.includes('travel')) return Plane;
+  return Target;
+}
+
+function getChallengeIcon(challengeName: string) {
+  const name = challengeName.toLowerCase();
+  if (name.includes('week')) return CalendarDays;
+  if (name.includes('no-spend') || name.includes('spend')) return Ban;
+  return Target;
+}
+
+function getActivityIcon(activityName: string) {
+  const name = activityName.toLowerCase();
+  if (name.includes('salary') || name.includes('income')) return Briefcase;
+  if (name.includes('zesco') || name.includes('payment')) return Zap;
+  if (name.includes('airtel')) return Smartphone;
+  return Clock;
+}
+
 function getInitialsFromEmail(email?: string | null): string {
   if (!email) return 'K';
   const base = email.split('@')[0] ?? 'K';
@@ -225,14 +313,20 @@ function BarChart({
 
   return (
     <>
-      <div className="chart-area" style={{ height }}>
+      <div className="chart-area" style={{ height, position: 'relative' }}>
         {series.map((d, idx) => {
           const incomeH = Math.round((d.income / max) * 100);
           const expenseH = Math.round((d.expense / max) * 100);
           return (
-            <div className="bar-group" key={idx}>
-              <div className="bar income-bar" style={{ height: `${incomeH}%`, flex: 1 }} />
-              <div className="bar expense-bar" style={{ height: `${expenseH}%`, flex: 1 }} />
+            <div className="bar-group" key={idx} style={{ position: 'relative', display: 'flex', gap: 4, alignItems: 'flex-end', height: '100%' }}>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', height: '100%' }}>
+                <div className="bar income-bar" style={{ height: `${incomeH}%`, flex: 1, minHeight: 4 }} />
+                <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--acc)', marginTop: 4, whiteSpace: 'nowrap' }}>K{d.income}</div>
+              </div>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', height: '100%' }}>
+                <div className="bar expense-bar" style={{ height: `${expenseH}%`, flex: 1, minHeight: 4 }} />
+                <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--danger)', marginTop: 4, whiteSpace: 'nowrap' }}>K{d.expense}</div>
+              </div>
             </div>
           );
         })}
@@ -259,21 +353,23 @@ function TxList({ data }: { data: Tx[] }) {
 
   return (
     <>
-      {data.map((t) => (
-        <div className="tx-item" key={`${t.name}-${t.date}-${t.amount}`}
-        >
-          <div className="tx-icon" style={{ background: t.color }}>
-            {t.icon}
-          </div>
-          <div style={{ flex: 1 }}>
-            <div className="tx-name">{t.name}</div>
-            <div className="tx-meta">
-              {t.cat} · {t.date}
+      {data.map((t) => {
+        const IconComponent = getCategoryIcon(t.cat);
+        return (
+          <div className="tx-item" key={`${t.name}-${t.date}-${t.amount}`}>
+            <div className="tx-icon" style={{ background: t.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <IconComponent size={18} strokeWidth={2.5} style={{ color: 'inherit' }} />
             </div>
+            <div style={{ flex: 1 }}>
+              <div className="tx-name">{t.name}</div>
+              <div className="tx-meta">
+                {t.cat} · {t.date}
+              </div>
+            </div>
+            <div className={`tx-amount ${t.type}`}>{t.type === 'credit' ? '+' : '-'}K {Math.abs(t.amount).toLocaleString()}</div>
           </div>
-          <div className={`tx-amount ${t.type}`}>{t.type === 'credit' ? '+' : '-'}K {Math.abs(t.amount).toLocaleString()}</div>
-        </div>
-      ))}
+        );
+      })}
     </>
   );
 }
@@ -287,6 +383,8 @@ export function KwachawiseV2Page() {
 
   const [isDark, setIsDark] = useState(true);
   const [activePeriod, setActivePeriod] = useState<'Apr' | 'Q1' | 'YTD'>('Apr');
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   const [globalSearch, setGlobalSearch] = useState('');
 
@@ -304,6 +402,19 @@ export function KwachawiseV2Page() {
     return () => {
       document.body.classList.remove('kw-v2');
     };
+  }, []);
+
+  useEffect(() => {
+    const onOpen = () => setSheetOpen(true);
+    window.addEventListener('open-transaction-sheet', onOpen as EventListener);
+    return () => window.removeEventListener('open-transaction-sheet', onOpen as EventListener);
+  }, []);
+
+  useEffect(() => {
+    // Fetch categories on component mount
+    apiGet<{ categories: Category[] }>('/categories')
+      .then((res) => setCategories(res.categories))
+      .catch((err) => console.error('Failed to load categories:', err));
   }, []);
 
   const demoName = useMemo(() => {
@@ -715,61 +826,61 @@ export function KwachawiseV2Page() {
     <div className="nav">
       <div className="nav-section">Main</div>
       <div className={`nav-item ${activePage === 'dashboard' ? 'active' : ''}`} onClick={() => goTo('dashboard')}>
-        ⬛ Dashboard
+        <Home size={16} /> Dashboard
       </div>
       <div className={`nav-item ${activePage === 'accounts' ? 'active' : ''}`} onClick={() => goTo('accounts')}>
-        🏦 Accounts
+        <Landmark size={16} /> Accounts
       </div>
       <div className={`nav-item ${activePage === 'transactions' ? 'active' : ''}`} onClick={() => goTo('transactions')}>
-        ↕ Transactions
+        <ReceiptText size={16} /> Transactions
       </div>
       <div className={`nav-item ${activePage === 'budgets' ? 'active' : ''}`} onClick={() => goTo('budgets')}>
-        ⏱ Budgets <span className="nav-badge warn">1</span>
+        <BarChart3 size={16} /> Budgets <span className="nav-badge warn">1</span>
       </div>
       <div className={`nav-item ${activePage === 'goals' ? 'active' : ''}`} onClick={() => goTo('goals')}>
-        ★ Goals
+        <Target size={16} /> Goals
       </div>
 
       <div className="nav-section">Zambia</div>
       <div className={`nav-item ${activePage === 'chilimba' ? 'active' : ''}`} onClick={() => goTo('chilimba')}>
-        ◈ Chilimba <span className="nav-badge">2</span>
+        <Users size={16} /> Chilimba <span className="nav-badge">2</span>
       </div>
       <div className={`nav-item ${activePage === 'paye' ? 'active' : ''}`} onClick={() => goTo('paye')}>
-        ≡ PAYE Calculator
+        <Calculator size={16} /> PAYE Calculator
       </div>
 
       <div className="nav-section">Finance</div>
       <div className={`nav-item ${activePage === 'recurring' ? 'active' : ''}`} onClick={() => goTo('recurring')}>
-        ↻ Recurring
+        <Repeat size={16} /> Recurring
       </div>
       <div className={`nav-item ${activePage === 'debt' ? 'active' : ''}`} onClick={() => goTo('debt')}>
-        📉 Debt Tracker
+        <TrendingDown size={16} /> Debt Tracker
       </div>
       <div className={`nav-item ${activePage === 'networth' ? 'active' : ''}`} onClick={() => goTo('networth')}>
-        ◎ Net Worth
+        <Scale size={16} /> Net Worth
       </div>
       <div className={`nav-item ${activePage === 'currency' ? 'active' : ''}`} onClick={() => goTo('currency')}>
-        💱 Multi-currency
+        <DollarSign size={16} /> Multi-currency
       </div>
       <div className={`nav-item ${activePage === 'invest' ? 'active' : ''}`} onClick={() => goTo('invest')}>
-        📈 Investments
+        <TrendingUp size={16} /> Investments
       </div>
 
       <div className="nav-section">Insights</div>
       <div className={`nav-item ${activePage === 'ai' ? 'active' : ''}`} onClick={() => goTo('ai')}>
-        ✦ AI Advisor <span className="nav-badge">3</span>
+        <Cpu size={16} /> AI Advisor <span className="nav-badge">3</span>
       </div>
       <div className={`nav-item ${activePage === 'calendar' ? 'active' : ''}`} onClick={() => goTo('calendar')}>
-        📅 Calendar
+        <Calendar size={16} /> Calendar
       </div>
       <div className={`nav-item ${activePage === 'challenges' ? 'active' : ''}`} onClick={() => goTo('challenges')}>
-        🏆 Challenges
+        <Trophy size={16} /> Challenges
       </div>
       <div className={`nav-item ${activePage === 'shared' ? 'active' : ''}`} onClick={() => goTo('shared')}>
-        👥 Shared Budgets
+        <Users size={16} /> Shared Budgets
       </div>
       <div className={`nav-item ${activePage === 'reports' ? 'active' : ''}`} onClick={() => goTo('reports')}>
-        📊 Reports
+        <BarChart3 size={16} /> Reports
       </div>
     </div>
   );
@@ -835,6 +946,83 @@ export function KwachawiseV2Page() {
       </div>
     </div>
   );
+
+  const handleGlobalSave = async (tx: {
+    amount: number;
+    type: 'expense' | 'income';
+    category: string;
+    date: string;
+    note?: string;
+    recurrence?: {
+      frequency: string;
+      interval?: number;
+      dayOfMonth?: number | null;
+      weekday?: number | null;
+    };
+  }) => {
+    try {
+      // Convert category name to category ID
+      // If categories not loaded yet, try to load them
+      let catList = categories;
+      if (catList.length === 0) {
+        try {
+          const res = await apiGet<{ categories: Category[] }>('/categories');
+          catList = res.categories;
+        } catch (err) {
+          console.warn('Failed to load categories:', err);
+        }
+      }
+      
+      // Convert category name to category ID
+      let categoryId = catList.find((cat) => cat.name === tx.category)?.id;
+      if (!categoryId) {
+        // If exact match not found, try case-insensitive
+        categoryId = catList.find((cat) => cat.name.toLowerCase() === tx.category.toLowerCase())?.id;
+      }
+      if (!categoryId) {
+        // If still not found, try to use the category as-is (might be an ID already)
+        categoryId = tx.category;
+        console.warn(`Category "${tx.category}" not found in user's categories, using as-is`);
+      }
+      
+      const res = await apiPost<{ transaction: any }>('/transactions', {
+        type: tx.type,
+        amountNgwee: tx.amount,
+        categoryId,
+        occurredAt: tx.date,
+        note: tx.note || null
+      });
+      
+      // Dispatch success event so any listeners can update UI
+      window.dispatchEvent(
+        new CustomEvent('transaction:created', {
+          detail: res.transaction
+        })
+      );
+      
+      // Close the sheet
+      setSheetOpen(false);
+      
+      // If recurrence specified, create recurring schedule (non-blocking)
+      if (tx.recurrence && tx.recurrence.frequency && tx.recurrence.frequency !== 'none') {
+        apiPost('/recurring', {
+          type: tx.type,
+          amount_ngwee: tx.amount,
+          category_id: categoryId,
+          frequency: tx.recurrence.frequency,
+          interval: tx.recurrence.interval ?? 1,
+          day_of_month: tx.recurrence.dayOfMonth ?? null,
+          weekday: tx.recurrence.weekday ?? null,
+          next_occurrence: tx.date
+        }).catch((err) => {
+          console.error('Failed to create recurring schedule', err);
+        });
+      }
+    } catch (err) {
+      console.error('Failed to save transaction:', err);
+      throw err;
+    }
+  };
 
   return (
     <div className={`kw-v2-root ${isDark ? '' : 'light-mode'}`}>
@@ -939,20 +1127,28 @@ export function KwachawiseV2Page() {
               </div>
 
               <div className="quick-actions">
-                <div className="quick-btn" onClick={() => goTo('transactions')}>
-                  <div className="quick-btn-icon">+</div>
+                <div className="quick-btn" onClick={() => goTo('transactions')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, cursor: 'pointer', transition: 'all 0.2s' }}>
+                  <div className="quick-btn-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 40, height: 40 }}>
+                    <Plus size={20} />
+                  </div>
                   <div className="quick-btn-label">Add Transaction</div>
                 </div>
-                <div className="quick-btn" onClick={() => goTo('debt')}>
-                  <div className="quick-btn-icon">📉</div>
+                <div className="quick-btn" onClick={() => goTo('debt')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, cursor: 'pointer', transition: 'all 0.2s' }}>
+                  <div className="quick-btn-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 40, height: 40 }}>
+                    <TrendingDown size={20} />
+                  </div>
                   <div className="quick-btn-label">Debt Tracker</div>
                 </div>
-                <div className="quick-btn" onClick={() => goTo('challenges')}>
-                  <div className="quick-btn-icon">🏆</div>
+                <div className="quick-btn" onClick={() => goTo('challenges')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, cursor: 'pointer', transition: 'all 0.2s' }}>
+                  <div className="quick-btn-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 40, height: 40 }}>
+                    <Trophy size={20} />
+                  </div>
                   <div className="quick-btn-label">Challenges</div>
                 </div>
-                <div className="quick-btn" onClick={() => goTo('paye')}>
-                  <div className="quick-btn-icon">≡</div>
+                <div className="quick-btn" onClick={() => goTo('paye')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, cursor: 'pointer', transition: 'all 0.2s' }}>
+                  <div className="quick-btn-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 40, height: 40 }}>
+                    <Calculator size={20} />
+                  </div>
                   <div className="quick-btn-label">PAYE Calc</div>
                 </div>
               </div>
@@ -973,12 +1169,22 @@ export function KwachawiseV2Page() {
                       </div>
                     </div>
                   </div>
-                  <BarChart series={data4} labels={months4} />
+                  <div style={{ height: 300 }}>
+                    <DailyTrendChart 
+                      items={data4.map((d, i) => ({
+                        date: months4[i],
+                        income_ngwee: d.income * 100,
+                        expense_ngwee: d.expense * 100
+                      }))}
+                    />
+                  </div>
                 </div>
 
                 <div className="ai-card">
                   <div className="ai-header">
-                    <div className="ai-icon">✦</div>
+                    <div className="ai-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Cpu size={18} strokeWidth={2.5} />
+                    </div>
                     <div>
                       <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--t1)' }}>AI Advisor</div>
                       <div style={{ fontSize: 11, color: 'var(--acc)' }}>3 new insights</div>
@@ -1076,7 +1282,7 @@ export function KwachawiseV2Page() {
                   </div>
                   <div className="account-card">
                     <div className="account-icon" style={{ background: 'rgba(0,200,150,.15)' }}>
-                      🏦
+                      <Landmark size={18} strokeWidth={2.4} />
                     </div>
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--t1)' }}>Zanaco Current</div>
@@ -1088,7 +1294,7 @@ export function KwachawiseV2Page() {
                   </div>
                   <div className="account-card">
                     <div className="account-icon" style={{ background: 'rgba(55,138,221,.15)' }}>
-                      📱
+                      <Smartphone size={18} strokeWidth={2.4} />
                     </div>
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--t1)' }}>Airtel Money</div>
@@ -1100,7 +1306,7 @@ export function KwachawiseV2Page() {
                   </div>
                   <div className="account-card">
                     <div className="account-icon" style={{ background: 'rgba(245,166,35,.15)' }}>
-                      💳
+                      <PiggyBank size={18} strokeWidth={2.4} />
                     </div>
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--t1)' }}>Stanbic Savings</div>
@@ -1112,7 +1318,7 @@ export function KwachawiseV2Page() {
                   </div>
                   <div className="account-card">
                     <div className="account-icon" style={{ background: 'rgba(168,85,247,.15)' }}>
-                      💵
+                      <Wallet size={18} strokeWidth={2.4} />
                     </div>
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--t1)' }}>Cash Wallet</div>
@@ -1187,7 +1393,7 @@ export function KwachawiseV2Page() {
                   <button className="export-btn" onClick={exportCSV}>
                     ⬇ Export CSV
                   </button>
-                  <button className="add-btn">+ Add</button>
+                  <button className="add-btn" onClick={() => window.dispatchEvent(new CustomEvent('open-transaction-sheet'))}>+ Add</button>
                 </div>
               </div>
 
@@ -1284,7 +1490,10 @@ export function KwachawiseV2Page() {
                             marginBottom: 8
                           }}
                         >
-                          <span style={{ fontSize: 18 }}>{g.icon}</span>
+                            {(() => {
+                              const GoalIcon = getGoalIcon(g.name);
+                              return <GoalIcon size={18} strokeWidth={2.4} />;
+                            })()}
                           <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--acc)', fontFamily: 'var(--mono)' }}>
                             {pct}%
                           </span>
@@ -1494,7 +1703,10 @@ export function KwachawiseV2Page() {
                         background: r.type === 'credit' ? 'rgba(0,200,150,.12)' : 'rgba(226,75,74,.1)'
                       }}
                     >
-                      {r.icon}
+                      {(() => {
+                        const RecurringIcon = getRecurringIcon(r.name);
+                        return <RecurringIcon size={18} strokeWidth={2.4} />;
+                      })()}
                     </div>
                     <div style={{ flex: 1 }}>
                       <div className="tx-name">{r.name}</div>
@@ -1601,7 +1813,13 @@ export function KwachawiseV2Page() {
                     <div key={a.name} style={{ marginBottom: 10 }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
                         <span style={{ fontSize: 12, color: 'var(--t1)' }}>
-                          {a.icon} {a.name}
+                          <span style={{ display: 'inline-flex', marginRight: 4, verticalAlign: 'middle' }}>
+                            {(() => {
+                              const AssetIcon = getAssetIcon(a.name);
+                              return <AssetIcon size={15} strokeWidth={2.4} />;
+                            })()}
+                          </span>
+                          {a.name}
                         </span>
                         <span style={{ fontSize: 12, fontFamily: 'var(--mono)', color: 'var(--t1)' }}>
                           K{a.val.toLocaleString()}
@@ -1741,7 +1959,9 @@ export function KwachawiseV2Page() {
                 <div>
                   <div className="ai-card" style={{ marginBottom: 12 }}>
                     <div className="ai-header">
-                      <div className="ai-icon">✦</div>
+                      <div className="ai-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: '8px', background: 'linear-gradient(135deg, #00C896 0%, #378ADD 100%)' }}>
+                        <Cpu size={18} color="white" />
+                      </div>
                       <div>
                         <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--t1)' }}>AI Financial Advisor</div>
                         <div style={{ fontSize: 11, color: 'var(--acc)' }}>Powered by your data</div>
@@ -1774,7 +1994,7 @@ export function KwachawiseV2Page() {
                         }}
                       />
                       <button className="calc-btn" onClick={askAI}>
-                        Ask ✦
+                        Ask AI
                       </button>
                     </div>
 
@@ -1791,7 +2011,7 @@ export function KwachawiseV2Page() {
                           lineHeight: 1.6
                         }}
                       >
-                        <span style={{ color: 'var(--acc)', fontWeight: 500 }}>✦ Advisor:</span> {aiResponse}
+                        <span style={{ color: 'var(--acc)', fontWeight: 500 }}>AI Advisor:</span> {aiResponse}
                       </div>
                     ) : null}
 
@@ -1919,10 +2139,10 @@ export function KwachawiseV2Page() {
                     Events This Month
                   </div>
 
-                  {[{ icon: '💼', date: 'Apr 25', name: 'Salary received', color: 'var(--acc)' },
-                    { icon: '⚡', date: 'Apr 30', name: 'ZESCO payment', color: 'var(--danger)' },
-                    { icon: '📱', date: 'Apr 30', name: 'Airtel payment', color: 'var(--warn)' },
-                    { icon: '◈', date: 'May 15', name: 'Chilimba payout', color: 'var(--info)' }].map((e) => (
+                  {[{ date: 'Apr 25', name: 'Salary received', color: 'var(--acc)' },
+                    { date: 'Apr 30', name: 'ZESCO payment', color: 'var(--danger)' },
+                    { date: 'Apr 30', name: 'Airtel payment', color: 'var(--warn)' },
+                    { date: 'May 15', name: 'Chilimba payout', color: 'var(--info)' }].map((e) => (
                     <div
                       key={e.name}
                       style={{
@@ -1935,7 +2155,12 @@ export function KwachawiseV2Page() {
                         marginBottom: 7
                       }}
                     >
-                      <span style={{ fontSize: 16 }}>{e.icon}</span>
+                      <span style={{ fontSize: 16, display: 'inline-flex' }}>
+                        {(() => {
+                          const ActivityIcon = getActivityIcon(e.name);
+                          return <ActivityIcon size={16} strokeWidth={2.4} color="white" />;
+                        })()}
+                      </span>
                       <div>
                         <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--t1)' }}>{e.name}</div>
                         <div style={{ fontSize: 11, color: e.color }}>{e.date}</div>
@@ -1956,7 +2181,12 @@ export function KwachawiseV2Page() {
                   const pct = clampPercent((c.progress / c.target) * 100);
                   return (
                     <div className="challenge-card" key={c.name}>
-                      <div style={{ fontSize: 24, marginBottom: 8 }}>{c.icon}</div>
+                      <div style={{ fontSize: 24, marginBottom: 8 }}>
+                        {(() => {
+                          const ChallengeIcon = getChallengeIcon(c.name);
+                          return <ChallengeIcon size={24} strokeWidth={2.2} />;
+                        })()}
+                      </div>
                       <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--t1)', marginBottom: 4 }}>{c.name}</div>
                       <div style={{ fontSize: 11, color: 'var(--t2)', marginBottom: 8, lineHeight: 1.5 }}>{c.desc}</div>
                       <div className="challenge-progress">
@@ -2075,13 +2305,156 @@ export function KwachawiseV2Page() {
 
               <div className="card">
                 <div className="card-title">2026 Overview</div>
-                <div className="card-sub">Monthly income vs expenses</div>
+                <div className="card-sub">Income vs Expenses Trend</div>
                 <BarChart series={data12} labels={months12} height={160} />
+              </div>
+
+              <div className="card">
+                <div className="card-title">Expense Breakdown</div>
+                <div className="card-sub">Spending by category (YTD)</div>
+                <div style={{ height: 200 }}>
+                  <CategoryPieChart
+                    items={[
+                      { categoryName: 'Groceries', expense_ngwee: 124000 },
+                      { categoryName: 'Dining Out', expense_ngwee: 38000 },
+                      { categoryName: 'Transport', expense_ngwee: 28000 },
+                      { categoryName: 'Utilities', expense_ngwee: 45500 },
+                      { categoryName: 'Shopping', expense_ngwee: 42000 }
+                    ]}
+                  />
+                </div>
+              </div>
+
+              <div className="card">
+                <div className="card-title">Budget Performance</div>
+                <div className="card-sub">Budgeted vs Actual Spending</div>
+                {budgets.map((b) => {
+                  const pct = Math.round((b.spent / b.total) * 100);
+                  const over = b.spent > b.total;
+                  return (
+                    <div className="budget-item" key={b.name}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
+                        <span style={{ fontSize: 12, fontWeight: 500, color: 'var(--t1)' }}>{b.name}</span>
+                        <span
+                          style={{
+                            fontSize: 11,
+                            fontFamily: 'var(--mono)',
+                            color: over ? 'var(--danger)' : 'var(--t2)'
+                          }}
+                        >
+                          K{b.spent} / K{b.total}
+                        </span>
+                      </div>
+                      <div style={{ height: 6, background: 'var(--card2)', borderRadius: 3, overflow: 'hidden' }}>
+                        <div
+                          style={{
+                            height: '100%',
+                            background: b.color,
+                            width: `${Math.min(pct, 100)}%`,
+                            transition: 'width 0.3s'
+                          }}
+                        />
+                      </div>
+                      <div style={{ fontSize: 11, color: 'var(--t2)', marginTop: 3 }}>
+                        {pct}% of budget {over && `(+K${b.spent - b.total} over)`}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="card">
+                <div className="card-title">Savings Progress</div>
+                <div className="card-sub">Monthly net savings (Income - Expense)</div>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                  {data12.map((month, idx) => {
+                    const savings = month.income - month.expense;
+                    const savingsRate = month.income > 0 ? Math.round((savings / month.income) * 100) : 0;
+                    return (
+                      <div
+                        key={idx}
+                        style={{
+                          flex: '1 1 calc(25% - 8px)',
+                          minWidth: 100,
+                          padding: 12,
+                          background: 'var(--card2)',
+                          borderRadius: 8,
+                          textAlign: 'center'
+                        }}
+                      >
+                        <div style={{ fontSize: 11, color: 'var(--t2)', marginBottom: 4 }}>
+                          {months12[idx]}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: 14,
+                            fontWeight: 600,
+                            color: savings > 0 ? '#00C896' : '#E24B4A',
+                            fontFamily: 'var(--mono)'
+                          }}
+                        >
+                          K{Math.abs(savings)}
+                        </div>
+                        <div style={{ fontSize: 10, color: 'var(--t2)', marginTop: 2 }}>
+                          {savingsRate}%
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="card">
+                <div className="card-title">Net Worth History</div>
+                <div className="card-sub">Asset value growth over 8 months</div>
+                <div style={{ display: 'flex', alignItems: 'flex-end', gap: 6, height: 140, paddingTop: 16 }}>
+                  {nwHistory.map((nw, idx) => {
+                    const heightPct = (nw / nwHistoryMax) * 100;
+                    return (
+                      <div
+                        key={idx}
+                        style={{
+                          flex: 1,
+                          background: 'var(--acc)',
+                          borderRadius: 4,
+                          height: `${heightPct}%`,
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'flex-end',
+                          alignItems: 'center',
+                          paddingBottom: 4,
+                          minHeight: 20
+                        }}
+                        title={`K${nw}`}
+                      >
+                        <span style={{ fontSize: 9, color: 'white', fontWeight: 600, textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>
+                          K{(nw / 100).toFixed(0)}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 12, fontSize: 10, color: 'var(--t2)' }}>
+                  <span>Jan</span>
+                  <span>Feb</span>
+                  <span>Mar</span>
+                  <span>Apr</span>
+                  <span>May</span>
+                  <span>Jun</span>
+                  <span>Jul</span>
+                  <span>Aug</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      <TransactionSheet
+        open={sheetOpen}
+        onClose={() => setSheetOpen(false)}
+        onSave={handleGlobalSave}
+      />
     </div>
   );
 }
